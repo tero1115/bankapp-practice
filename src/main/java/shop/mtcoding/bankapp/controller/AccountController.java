@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 
 import shop.mtcoding.bankapp.dto.account.AccountSaveReqDto;
+import shop.mtcoding.bankapp.dto.account.AccountWithdrawReqDto;
 import shop.mtcoding.bankapp.handler.ex.CustomException;
 import shop.mtcoding.bankapp.model.account.Account;
 import shop.mtcoding.bankapp.model.account.AccountRepository;
@@ -29,6 +30,27 @@ public class AccountController {
 
     @Autowired
     private AccountService accountService;
+
+    @PostMapping("/account/withdraw")
+    public String withdraw(AccountWithdrawReqDto accountWithdrawReqDto) {
+        if (accountWithdrawReqDto.getAmount() == null) {
+            throw new CustomException("출금금액을 입력해주세요", HttpStatus.BAD_REQUEST);
+        }
+        if (accountWithdrawReqDto.getAmount().longValue() <= 0) {
+            throw new CustomException("출금금액이 0원 이하일 수 없습니다", HttpStatus.BAD_REQUEST);
+        }
+        if (accountWithdrawReqDto.getWAccountNumber() == null || accountWithdrawReqDto.getWAccountNumber().isEmpty()) {
+            throw new CustomException("계좌번호를 입력해주세요", HttpStatus.BAD_REQUEST);
+        }
+        if (accountWithdrawReqDto.getWAccountPassword() == null
+                || accountWithdrawReqDto.getWAccountPassword().isEmpty()) {
+            throw new CustomException("계좌비밀번호를 입력해주세요", HttpStatus.BAD_REQUEST);
+        }
+
+        int accountId = accountService.계좌출금(accountWithdrawReqDto);
+
+        return "redirect:/account/" + accountId;
+    }
 
     @PostMapping("/account")
     public String save(AccountSaveReqDto accountSaveReqDto) {
@@ -62,7 +84,7 @@ public class AccountController {
         return "account/main";
     }
 
-    @GetMapping("account/detail")
+    @GetMapping("account/{id}")
     public String detail() {
         return "account/detail";
     }

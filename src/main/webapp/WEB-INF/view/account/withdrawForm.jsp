@@ -6,7 +6,7 @@
     <form action="/account/withdraw" method="post">
         <input type="text" name="amount" placeholder="Enter 출금금액" /><br />
         <input type="text" name="wAccountNumber" placeholder="Enter 출금계좌" /><br />
-        <input type="password" name="wAccountPassword" placeholder="Enter 출금계좌비밀번호" /><br />
+        <input type="password" name="wAccountPassword" placeholder="Enter 출금계좌 비밀번호" /><br />
         <button>출금</button>
     </form>
     </body>

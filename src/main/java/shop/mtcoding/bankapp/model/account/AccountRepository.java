@@ -17,4 +17,7 @@ public interface AccountRepository {
     public Account findById(int id);
 
     public List<Account> findByUserId(Integer id);
+
+    public Account findByNumber(String number);
+
 }

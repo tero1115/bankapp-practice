@@ -3,7 +3,7 @@
   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="shop.mtcoding.bankapp.model.HistoryRepository">
+<mapper namespace="shop.mtcoding.bankapp.model.history.HistoryRepository">
 
     <select id="findByUsernameAndPassword" resultType="shop.mtcoding.bankapp.model.history.History">
         select * from history_tb where username = #{username} and password = #{password}
