@@ -12,10 +12,12 @@
                 </tr>
             </thead>
             <tbody>
-                <tr>
-                    <td>1111</td>
-                    <td>1000원</td>
-                </tr>
+                <c:forEach items="${accountList}" var="account">
+                    <tr>
+                        <td><a href="/account/${account.id}">${account.number}</a></td>
+                        <td>${account.balance}원</td>
+                    </tr>
+                </c:forEach>
             </tbody>
         </table>
 
