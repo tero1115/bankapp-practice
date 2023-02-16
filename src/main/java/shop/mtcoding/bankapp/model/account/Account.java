@@ -18,6 +18,10 @@ public class Account {
     private Integer userId;
     private Timestamp createdAt;
 
+    public void deposit(Long amount) {
+        this.balance = this.balance + amount;
+    }
+
     public void withdraw(Long amount) {
         this.balance = this.balance - amount;
     }

@@ -5,6 +5,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import shop.mtcoding.bankapp.dto.account.AccountDepositReqDto;
 import shop.mtcoding.bankapp.dto.account.AccountSaveReqDto;
 import shop.mtcoding.bankapp.dto.account.AccountWithdrawReqDto;
 import shop.mtcoding.bankapp.handler.ex.CustomException;
@@ -21,6 +22,32 @@ public class AccountService {
 
     @Autowired
     private HistoryRepository historyRepository;
+
+    @Transactional
+    public int 계좌입금(AccountDepositReqDto accountDepositReqDto) {
+        // 1. 계좌존재 여부
+        Account accountPS = accountRepository.findByNumber(accountDepositReqDto.getWAccountNumber());
+        if (accountPS == null) {
+            throw new CustomException("계좌가 존재하지 않습니다", HttpStatus.BAD_REQUEST);
+        }
+
+        // 2. 입금(balance 변경(플러스))
+        accountPS.deposit(accountDepositReqDto.getAmount());
+        accountRepository.updateById(accountPS);
+
+        // 3. 히스토리 (거래내역)
+        History history = new History();
+        history.setAmount(accountDepositReqDto.getAmount()); // 입금금액
+        history.setWAccountId(null);
+        history.setDAccountId(accountPS.getId()); // 입금계좌의 Id
+        history.setWBalance(null);
+        history.setDBalance(accountPS.getBalance()); // 입금계좌의 잔액
+
+        historyRepository.insert(history);
+
+        // 4. 해당 계좌의 id를 return
+        return accountPS.getId();
+    }
 
     @Transactional
     public int 계좌출금(AccountWithdrawReqDto accountWithdrawReqDto) {
@@ -63,4 +90,5 @@ public class AccountService {
             throw new CustomException("계좌생성 실패", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
 }
