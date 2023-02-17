@@ -79,6 +79,7 @@ public class UserContoller {
 
     @GetMapping("logout")
     public String logout() {
+        session.invalidate();
         return "user/loginForm";
     }
 }
