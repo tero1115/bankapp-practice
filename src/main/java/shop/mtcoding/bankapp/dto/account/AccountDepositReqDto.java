@@ -7,5 +7,5 @@ import lombok.Setter;
 @Setter
 public class AccountDepositReqDto {
     private Long amount;
-    private String wAccountNumber;
+    private String dAccountNumber;
 }

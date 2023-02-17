@@ -40,13 +40,13 @@ public class AccountController {
         if (accountDepositReqDto.getAmount().longValue() <= 0) {
             throw new CustomException("입금금액이 0원 이하일 수 없습니다", HttpStatus.BAD_REQUEST);
         }
-        if (accountDepositReqDto.getWAccountNumber() == null || accountDepositReqDto.getWAccountNumber().isEmpty()) {
+        if (accountDepositReqDto.getDAccountNumber() == null || accountDepositReqDto.getDAccountNumber().isEmpty()) {
             throw new CustomException("계좌번호를 입력해주세요", HttpStatus.BAD_REQUEST);
         }
 
-        int accountId = accountService.계좌입금(accountDepositReqDto);
+        accountService.계좌입금(accountDepositReqDto);
 
-        return "redirect:/account/" + accountId;
+        return "redirect:/";
     }
 
     @PostMapping("/account/withdraw")

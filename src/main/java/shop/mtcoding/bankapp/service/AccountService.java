@@ -24,9 +24,9 @@ public class AccountService {
     private HistoryRepository historyRepository;
 
     @Transactional
-    public int 계좌입금(AccountDepositReqDto accountDepositReqDto) {
+    public void 계좌입금(AccountDepositReqDto accountDepositReqDto) {
         // 1. 계좌존재 여부
-        Account accountPS = accountRepository.findByNumber(accountDepositReqDto.getWAccountNumber());
+        Account accountPS = accountRepository.findByNumber(accountDepositReqDto.getDAccountNumber());
         if (accountPS == null) {
             throw new CustomException("계좌가 존재하지 않습니다", HttpStatus.BAD_REQUEST);
         }
@@ -44,9 +44,6 @@ public class AccountService {
         history.setDBalance(accountPS.getBalance()); // 입금계좌의 잔액
 
         historyRepository.insert(history);
-
-        // 4. 해당 계좌의 id를 return
-        return accountPS.getId();
     }
 
     @Transactional
