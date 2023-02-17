@@ -7,6 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import shop.mtcoding.bankapp.dto.account.AccountDepositReqDto;
 import shop.mtcoding.bankapp.dto.account.AccountSaveReqDto;
+import shop.mtcoding.bankapp.dto.account.AccountTransferReqDto;
 import shop.mtcoding.bankapp.dto.account.AccountWithdrawReqDto;
 import shop.mtcoding.bankapp.handler.ex.CustomException;
 import shop.mtcoding.bankapp.model.account.Account;
@@ -22,6 +23,49 @@ public class AccountService {
 
     @Autowired
     private HistoryRepository historyRepository;
+
+    @Transactional
+    public int 이체하기(AccountTransferReqDto accountTransferReqDto, int principalId) {
+
+        // 1. 출금계좌존재 여부
+        Account wAccountPS = accountRepository.findByNumber(accountTransferReqDto.getWAccountNumber());
+        if (wAccountPS == null) {
+            throw new CustomException("출금계좌가 존재하지 않습니다", HttpStatus.BAD_REQUEST);
+        }
+        // 2. 입금계좌존재 여부
+        Account dAccountPS = accountRepository.findByNumber(accountTransferReqDto.getDAccountNumber());
+        if (dAccountPS == null) {
+            throw new CustomException("입금계좌가 존재하지 않습니다", HttpStatus.BAD_REQUEST);
+        }
+        // 3. 출금계좌 비밀번호 체크
+        wAccountPS.checkPassword(accountTransferReqDto.getWAccountPassword());
+
+        // 4. 출금 잔액확인
+        wAccountPS.checkBalance(accountTransferReqDto.getAmount());
+
+        // 5. 계좌 소유주 체크
+        wAccountPS.checkOwner(principalId);
+
+        // 6. 이체(balance 변경)
+        // 출금
+        wAccountPS.withdraw(accountTransferReqDto.getAmount());
+        accountRepository.updateById(wAccountPS);
+        // 입금
+        dAccountPS.deposit(accountTransferReqDto.getAmount());
+        accountRepository.updateById(dAccountPS);
+
+        // 7. 히스토리 (거래내역)
+        History history = new History();
+        history.setAmount(accountTransferReqDto.getAmount()); // 출금금액
+        history.setWAccountId(wAccountPS.getId()); // 출금계좌의 Id
+        history.setDAccountId(dAccountPS.getId()); // 입금계좌의 Id
+        history.setWBalance(wAccountPS.getBalance()); // 출금계좌의 잔액
+        history.setDBalance(dAccountPS.getBalance()); // 입금계좌의 잔액
+        historyRepository.insert(history);
+
+        // 8. 출금계좌의 id를 return
+        return wAccountPS.getId();
+    } // 서비스 메서드 종료시 커밋, 서비스 실행중 예외처리되면 롤백
 
     @Transactional
     public void 계좌입금(AccountDepositReqDto accountDepositReqDto) {

@@ -37,4 +37,11 @@ public class Account {
             throw new CustomException("잔액이 부족합니다", HttpStatus.BAD_REQUEST);
         }
     }
+
+    public void checkOwner(Integer principalId) {
+        if (userId != principalId) {
+            throw new CustomException("소유하고 있는 계좌가 아닙니다", HttpStatus.FORBIDDEN);
+        }
+    }
+
 }
